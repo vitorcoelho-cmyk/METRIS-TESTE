@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metris — Portal do Médico</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-deep:#1C1810;--bg-mid:#2A2318;--bg-panel:#211D13;
+  --border:#3A3020;--border-light:#2E2818;
+  --accent:#E07828;--accent-light:#F5A623;
+  --text-primary:#F5EDD8;--text-secondary:#BBA98A;
+  --text-muted:#6B5F48;--text-faint:#4A4030;
+  --green:#5CAF6A;--green-bg:#1A3320;
+  --red:#E05555;--red-bg:#3A1818;
+  --blue:#5B9ECA;--blue-bg:#1A2E3A;
+  --r:10px;--rl:14px;--sw:230px;
+}
+html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg-deep);color:var(--text-primary)}
+#login-screen{min-height:100vh;display:flex;align-items:stretch}
+.login-left{width:420px;flex-shrink:0;background:var(--bg-panel);border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;padding:56px 48px}
+.ll-logo{display:flex;align-items:center;gap:12px;margin-bottom:48px}
+.ll-name{font-size:22px;font-weight:600;letter-spacing:-0.3px}
+.ll-sub{font-size:11px;color:var(--accent);margin-top:2px;letter-spacing:0.5px}
+.ll-title{font-family:'DM Serif Display',serif;font-size:30px;margin-bottom:8px;font-weight:400}
+.ll-desc{font-size:13.5px;color:var(--text-muted);margin-bottom:36px;line-height:1.6}
+.fg{margin-bottom:18px}
+.fl{font-size:12px;color:var(--text-secondary);font-weight:500;letter-spacing:0.5px;margin-bottom:8px;display:block}
+.fi{width:100%;background:var(--bg-mid);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;font-family:'Sora',sans-serif;font-size:14px;color:var(--text-primary);outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--accent)}
+.fi::placeholder{color:var(--text-faint)}
+.btn-p{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s,transform .1s;margin-top:8px}
+.btn-p:hover{background:#C96820}
+.btn-p:active{transform:scale(.98)}
+.ll-forgot{font-size:12px;color:var(--accent);text-align:right;cursor:pointer;margin-top:12px}
+.ll-note{font-size:12px;color:var(--text-muted);text-align:center;margin-top:28px;line-height:1.6}
+.login-right{flex:1;background:var(--bg-deep);display:flex;align-items:center;justify-content:center;padding:48px;position:relative;overflow:hidden}
+.lc-out{width:460px;height:460px;border-radius:50%;border:1px dashed rgba(224,120,40,.25);position:absolute;animation:rot 30s linear infinite}
+.lc-in{width:300px;height:300px;border-radius:50%;border:1px dashed rgba(224,120,40,.15);position:absolute;animation:rot 20s linear infinite reverse}
+@keyframes rot{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.la-center{position:relative;z-index:2;text-align:center}
+.la-tag{font-family:'DM Serif Display',serif;font-size:32px;color:var(--text-primary);line-height:1.3;max-width:320px}
+.la-tag em{color:var(--accent);font-style:italic}
+.la-desc{font-size:13px;color:var(--text-muted);margin-top:14px;max-width:280px;margin-left:auto;margin-right:auto;line-height:1.7}
+#app-shell{display:none;height:100vh}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sw);background:var(--bg-panel);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.sb-logo{padding:26px 22px 22px;border-bottom:1px solid var(--border)}
+.sb-lw{display:flex;align-items:center;gap:10px}
+.sb-name{font-size:19px;font-weight:600;letter-spacing:-0.3px}
+.sb-sub{font-size:10px;color:var(--accent);margin-top:1px;letter-spacing:0.4px}
+.sb-nav{padding:14px 12px;flex:1;overflow-y:auto}
+.nl{font-size:10px;color:var(--text-faint);letter-spacing:1.5px;text-transform:uppercase;padding:10px 10px 6px;font-weight:500}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13.5px;color:var(--text-muted);transition:all .15s;font-weight:400;user-select:none;margin-bottom:1px}
+.ni:hover{background:var(--bg-mid);color:var(--text-primary)}
+.ni.active{background:var(--accent);color:#fff;font-weight:500}
+.ni svg{width:16px;height:16px;flex-shrink:0;opacity:.75}
+.ni.active svg{opacity:1}
+.sb-foot{padding:14px 12px;border-top:1px solid var(--border)}
+.up{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:var(--bg-mid);cursor:pointer}
+.av{width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.av.lg{width:52px;height:52px;font-size:17px}
+.un{font-size:13px;font-weight:500}
+.uc{font-size:11px;color:var(--text-muted);margin-top:1px}
+.lo-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text-faint);padding:4px;border-radius:4px;transition:color .15s;flex-shrink:0}
+.lo-btn:hover{color:var(--red)}
+.main{margin-left:var(--sw);height:100vh;overflow-y:auto;padding:32px 36px;background:var(--bg-deep)}
+.screen{display:none;animation:fi .2s ease}
+.screen.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px}
+.ph{font-family:'DM Serif Display',serif;font-size:27px;font-weight:400;letter-spacing:-0.3px}
+.ps{font-size:13px;color:var(--text-muted);margin-top:4px}
+.panel{background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--rl);padding:22px 24px}
+.phd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.pt{font-size:14px;font-weight:500}
+.pl{font-size:12px;color:var(--accent);cursor:pointer;background:none;border:none;font-family:'Sora',sans-serif}
+.pl:hover{text-decoration:underline}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:24px}
+.sc{background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--rl);padding:20px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;right:0;top:0;bottom:0;width:3px;background:var(--accent);border-radius:0 var(--rl) var(--rl) 0}
+.sl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;font-weight:500;margin-bottom:10px}
+.sv{font-size:24px;font-weight:600;letter-spacing:-.5px;line-height:1}
+.sn{font-size:12px;color:var(--green);margin-top:7px}
+.sn.m{color:var(--text-muted)}
+.alrt{background:#2A1E0E;border:1px solid #4A3010;border-radius:var(--rl);padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.ai{width:32px;height:32px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.at{font-size:13px;font-weight:500;color:#F5A623}
+.ad{font-size:12px;color:#9A7A4A;margin-top:2px}
+.aa{margin-left:auto;font-size:12px;color:var(--accent);cursor:pointer;white-space:nowrap;background:none;border:none;font-family:'Sora',sans-serif}
+.dtbl{width:100%;border-collapse:collapse}
+.dtbl th{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;padding:0 12px 12px 0;text-align:left;font-weight:500;border-bottom:1px solid var(--border)}
+.dtbl td{padding:13px 12px 13px 0;font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border-light);vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dtbl tr:hover td{color:var(--text-primary)}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.bg{background:var(--green-bg);color:var(--green)}
+.bo{background:#3A2810;color:var(--accent-light)}
+.br{background:var(--red-bg);color:var(--red)}
+.bb{background:var(--blue-bg);color:var(--blue)}
+.dg{display:grid;grid-template-columns:1fr 320px;gap:18px}
+.ec-list{display:flex;flex-direction:column;gap:10px}
+.ec{display:flex;align-items:center;gap:12px;padding:14px;border-radius:var(--r);background:var(--bg-mid);border:1px solid var(--border);cursor:pointer;transition:border-color .15s}
+.ec:hover{border-color:var(--accent)}
+.ei{width:40px;height:40px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+.en{font-size:13px;font-weight:500}
+.ecnpj{font-size:11px;color:var(--text-muted);margin-top:2px}
+.cl{display:flex;flex-direction:column;gap:9px}
+.ci{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-mid);border-radius:8px;cursor:pointer;border:1px solid var(--border);transition:border-color .15s}
+.ci:hover{border-color:var(--accent)}
+.cib{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cn{font-size:12.5px;font-weight:500}
+.cv{font-size:11px;color:var(--text-muted);margin-top:1px}
+.fbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.fip{background:var(--bg-panel);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text-primary);outline:none;transition:border-color .15s}
+.fip:focus{border-color:var(--accent)}
+.fip::placeholder{color:var(--text-faint)}
+.fsel{background:var(--bg-panel);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text-secondary);outline:none;cursor:pointer}
+.edg{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.ir{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border-light);font-size:13px}
+.ir:last-child{border-bottom:none}
+.ik{color:var(--text-muted)}
+.iv{font-weight:500;text-align:right}
+.ph-hd{background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--rl);padding:28px;display:flex;align-items:center;gap:22px;margin-bottom:20px}
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.tl{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tag{padding:5px 12px;border-radius:20px;background:var(--bg-mid);border:1px solid var(--border);font-size:12px;color:var(--text-secondary)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-left">
+    <div class="ll-logo">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <path d="M20 4L33 11.5V28.5L20 36L7 28.5V11.5Z" stroke="#E07828" stroke-width="1.2"/>
+        <path d="M13 16L20 12.5L27 16V24L20 27.5L13 24V16Z" fill="#E07828"/>
+        <path d="M20 12.5V20M13 16L20 20M27 16L20 20" stroke="#F5A623" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <div><div class="ll-name">Metris</div><div class="ll-sub">gestão contábil médica</div></div>
+    </div>
+    <div class="ll-title">Bem-vindo de volta</div>
+    <div class="ll-desc">Acesse seu portal para visualizar notas fiscais, pagamentos e sua gestão contábil.</div>
+    <div class="fg"><label class="fl">E-mail ou CRM</label><input class="fi" type="text" value="dr.carlos@email.com"></div>
+    <div class="fg"><label class="fl">Senha</label><input class="fi" type="password" value="12345678"></div>
+    <button class="btn-p" onclick="doLogin()">Entrar no portal</button>
+    <div class="ll-forgot">Esqueci minha senha</div>
+    <div class="ll-note">Acesso exclusivo para médicos cadastrados na Metris.<br>Dúvidas? Entre em contato com nossa equipe.</div>
+  </div>
+  <div class="login-right">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><div class="lc-out"></div><div class="lc-in"></div></div>
+    <div class="la-center">
+      <div style="margin-bottom:28px;"><svg width="72" height="72" viewBox="0 0 72 72" fill="none"><circle cx="36" cy="36" r="35" stroke="#3A3020"/><path d="M36 14L52 23V41L36 50L20 41V23Z" stroke="#E07828" stroke-width="1.5"/><path d="M24 30L36 24.5L48 30V42L36 47.5L24 42V30Z" fill="#E07828" opacity=".9"/><path d="M36 24.5V36M24 30L36 36M48 30L36 36" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+      <div class="la-tag">Sua gestão contábil, <em>simplificada</em></div>
+      <div class="la-desc">Acompanhe suas notas fiscais, empresas e pagamentos em um único lugar.</div>
+    </div>
+  </div>
+</div>
+
+<div id="app-shell" style="display:none;height:100vh;flex-direction:row;">
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-lw">
+        <svg width="32" height="32" viewBox="0 0 40 40" fill="none"><path d="M20 4L33 11.5V28.5L20 36L7 28.5V11.5Z" stroke="#E07828" stroke-width="1.2"/><path d="M13 16L20 12.5L27 16V24L20 27.5L13 24V16Z" fill="#E07828"/><path d="M20 12.5V20M13 16L20 20M27 16L20 20" stroke="#F5A623" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <div><div class="sb-name">Metris</div><div class="sb-sub">gestão contábil médica</div></div>
+      </div>
+    </div>
+    <div class="sb-nav">
+      <div class="nl">Principal</div>
+      <div class="ni active" data-s="dashboard" onclick="go(this)">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/></svg>
+        Visão Geral
+      </div>
+      <div class="ni" data-s="notas" onclick="go(this)">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Notas Fiscais
+      </div>
+      <div class="nl">Minha Conta</div>
+      <div class="ni" data-s="empresas" onclick="go(this)">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Minhas Empresas
+      </div>
+      <div class="ni" data-s="perfil" onclick="go(this)">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 14c0-3.3 2.7-5 6-5s6 1.7 6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Perfil
+      </div>
+    </div>
+    <div class="sb-foot">
+      <div class="up">
+        <div class="av">CM</div>
+        <div><div class="un">Dr. Carlos Melo</div><div class="uc">CRM-SP 123456</div></div>
+        <button class="lo-btn" onclick="doLogout()" title="Sair"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M11 11l3-3-3-3M14 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="screen active" id="s-dashboard">
+      <div class="topbar">
+        <div><div class="ph">Olá, Dr. Carlos 👋</div><div class="ps">Resumo de março de 2026</div></div>
+        <div style="display:flex;gap:10px;">
+          <div style="width:38px;height:38px;border-radius:8px;background:var(--bg-panel);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5A4.5 4.5 0 0 0 3.5 6v3L2 11h12l-1.5-2V6A4.5 4.5 0 0 0 8 1.5Z" stroke="#9A8E7A" stroke-width="1.4"/><path d="M6.5 13a1.5 1.5 0 0 0 3 0" stroke="#9A8E7A" stroke-width="1.4"/></svg>
+            <div style="width:7px;height:7px;background:var(--accent);border-radius:50%;position:absolute;top:7px;right:7px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alrt">
+        <div class="ai"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3v5M8 11v1" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="8" r="6.5" stroke="#fff" stroke-width="1.4"/></svg></div>
+        <div><div class="at">Competência de março disponível</div><div class="ad">2 notas fiscais emitidas aguardam sua conferência.</div></div>
+        <button class="aa" onclick="go(document.querySelector('[data-s=notas]'))">Ver notas →</button>
+      </div>
+
+      <div class="stats">
+        <div class="sc"><div class="sl">Faturamento no mês</div><div class="sv">R$ 34.200</div><div class="sn">↑ 12% vs fevereiro</div></div>
+        <div class="sc"><div class="sl">NF emitidas</div><div class="sv">8</div><div class="sn m">3 pendentes</div></div>
+        <div class="sc"><div class="sl">Empresas ativas</div><div class="sv">2</div><div class="sn m">MEI + LTDA</div></div>
+        <div class="sc"><div class="sl">Próx. vencimento</div><div class="sv">15 abr</div><div class="sn m">Pró-labore</div></div>
+      </div>
+
+      <div class="dg">
+        <div class="panel">
+          <div class="phd"><div class="pt">Últimas Notas Fiscais</div><button class="pl" onclick="go(document.querySelector('[data-s=notas]'))">Ver todas →</button></div>
+          <table class="dtbl">
+            <thead><tr><th>NF</th><th>Tomador</th><th>Competência</th><th>Valor</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--text-primary);font-weight:500">#00847</td><td>Hospital São Lucas</td><td>Mar / 2026</td><td style="color:var(--accent-light);font-weight:500">R$ 12.500</td><td><span class="badge bg">Pago</span></td></tr>
+              <tr><td style="color:var(--text-primary);font-weight:500">#00848</td><td>Clínica Saúde+</td><td>Mar / 2026</td><td style="color:var(--accent-light);font-weight:500">R$ 8.700</td><td><span class="badge bo">Pendente</span></td></tr>
+              <tr><td style="color:var(--text-primary);font-weight:500">#00839</td><td>Hospital São Lucas</td><td>Fev / 2026</td><td style="color:var(--accent-light);font-weight:500">R$ 11.200</td><td><span class="badge bg">Pago</span></td></tr>
+              <tr><td style="color:var(--text-primary);font-weight:500">#00840</td><td>Unimed Centro</td><td>Fev / 2026</td><td style="color:var(--accent-light);font-weight:500">R$ 1.800</td><td><span class="badge br">Cancelado</span></td></tr>
+              <tr><td style="color:var(--text-primary);font-weight:500">#00831</td><td>Clínica Saúde+</td><td>Jan / 2026</td><td style="color:var(--accent-light);font-weight:500">R$ 9.400</td><td><span class="badge bg">Pago</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="panel">
+            <div class="phd"><div class="pt">Minhas Empresas</div><button class="pl" onclick="go(document.querySelector('[data-s=empresas]'))">Detalhes →</button></div>
+            <div class="ec-list">
+              <div class="ec"><div class="ei">CM</div><div><div class="en">Carlos Melo Medicina</div><div class="ecnpj">CNPJ 45.123.456/0001-78</div></div><div style="margin-left:auto"><span class="badge bg">Ativa</span></div></div>
+              <div class="ec"><div class="ei" style="background:#C05A10;">CM</div><div><div class="en">Dr. Carlos MEI</div><div class="ecnpj">CNPJ 32.987.654/0001-11</div></div><div style="margin-left:auto"><span class="badge bg">Ativa</span></div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="phd"><div class="pt">Falar com a Metris</div></div>
+            <div class="cl">
+              <div class="ci"><div class="cib" style="background:var(--green-bg);"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="#5CAF6A" stroke-width="1.2"/><path d="M1 4l6 4 6-4" stroke="#5CAF6A" stroke-width="1.2"/></svg></div><div><div class="cn">E-mail</div><div class="cv">contato@metris.com.br</div></div></div>
+              <div class="ci"><div class="cib" style="background:var(--blue-bg);"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 2h2.7l1 2.5-1.5 1a8 8 0 0 0 3.8 3.8l1-1.5L12 8.8V11.5A1 1 0 0 1 11 12.5C5.2 12.5 1.5 8.8 1.5 3A1 1 0 0 1 2.5 2Z" stroke="#5B9ECA" stroke-width="1.2"/></svg></div><div><div class="cn">WhatsApp</div><div class="cv">(35) 99999-0000</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTAS FISCAIS -->
+    <div class="screen" id="s-notas">
+      <div class="topbar"><div><div class="ph">Notas Fiscais</div><div class="ps">Histórico completo de notas emitidas</div></div></div>
+      <div class="fbar">
+        <input class="fip" style="width:250px;" type="text" placeholder="Buscar por tomador ou número..." oninput="applyF()">
+        <select class="fsel" id="sf" onchange="applyF()">
+          <option value="">Todos os status</option>
+          <option>Pago</option><option>Pendente</option><option>Cancelado</option>
+        </select>
+        <select class="fsel" id="ef" onchange="applyF()">
+          <option value="">Todas as empresas</option>
+          <option>Carlos Melo Medicina</option>
+          <option>Dr. Carlos MEI</option>
+        </select>
+      </div>
+      <div class="panel" style="padding:0;">
+        <table class="dtbl">
+          <thead><tr>
+            <th style="padding-left:24px;">NF</th>
+            <th>Empresa</th><th>Tomador</th><th>Competência</th><th>Emissão</th><th>Valor</th><th>Status</th>
+            <th style="padding-right:24px;"></th>
+          </tr></thead>
+          <tbody id="ntb"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EMPRESAS -->
+    <div class="screen" id="s-empresas">
+      <div class="topbar"><div><div class="ph">Minhas Empresas</div><div class="ps">Detalhes das suas pessoas jurídicas</div></div></div>
+      <div class="edg">
+        <div>
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="phd">
+              <div style="display:flex;align-items:center;gap:12px;"><div class="ei" style="border-radius:10px;">CM</div><div><div style="font-size:15px;font-weight:500;">Carlos Melo Medicina Ltda</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Sociedade Limitada</div></div></div>
+              <span class="badge bg">Ativa</span>
+            </div>
+            <div class="ir"><span class="ik">CNPJ</span><span class="iv">45.123.456/0001-78</span></div>
+            <div class="ir"><span class="ik">Abertura</span><span class="iv">12 / mar / 2020</span></div>
+            <div class="ir"><span class="ik">Regime tributário</span><span class="iv">Simples Nacional</span></div>
+            <div class="ir"><span class="ik">CNAE principal</span><span class="iv">8630-5/04</span></div>
+            <div class="ir"><span class="ik">Capital social</span><span class="iv">R$ 50.000,00</span></div>
+            <div class="ir"><span class="ik">Pró-labore mensal</span><span class="iv">R$ 8.000,00</span></div>
+          </div>
+          <div class="panel">
+            <div class="phd"><div class="pt">Faturamento — últimos 6 meses</div></div>
+            <div style="display:flex;align-items:flex-end;gap:8px;height:90px;margin-top:8px;">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;"><div style="width:100%;background:var(--accent);opacity:.35;border-radius:4px 4px 0 0;height:48px;"></div><div style="font-size:10px;color:var(--text-muted)">Out</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;"><div style="width:100%;background:var(--accent);opacity:.45;border-radius:4px 4px 0 0;height:58px;"></div><div style="font-size:10px;color:var(--text-muted)">Nov</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;"><div style="width:100%;background:var(--accent);opacity:.52;border-radius:4px 4px 0 0;height:52px;"></div><div style="font-size:10px;color:var(--text-muted)">Dez</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;"><div style="width:100%;background:var(--accent);opacity:.62;border-radius:4px 4px 0 0;height:62px;"></div><div style="font-size:10px;color:var(--text-muted)">Jan</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;"><div style="width:100%;background:var(--accent);opacity:.78;border-radius:4px 4px 0 0;height:70px;"></div><div style="font-size:10px;color:var(--text-muted)">Fev</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;"><div style="width:100%;background:var(--accent);border-radius:4px 4px 0 0;height:82px;"></div><div style="font-size:10px;color:var(--accent);font-weight:500">Mar</div></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="phd">
+              <div style="display:flex;align-items:center;gap:12px;"><div class="ei" style="border-radius:10px;background:#C05A10;">CM</div><div><div style="font-size:15px;font-weight:500;">Dr. Carlos MEI</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Microempreendedor Individual</div></div></div>
+              <span class="badge bg">Ativa</span>
+            </div>
+            <div class="ir"><span class="ik">CNPJ</span><span class="iv">32.987.654/0001-11</span></div>
+            <div class="ir"><span class="ik">Abertura</span><span class="iv">05 / jun / 2022</span></div>
+            <div class="ir"><span class="ik">Regime tributário</span><span class="iv">MEI / SIMEI</span></div>
+            <div class="ir"><span class="ik">Limite anual MEI</span><span class="iv">R$ 81.000,00</span></div>
+            <div class="ir"><span class="ik">Faturado (2026)</span><span class="iv">R$ 19.200,00</span></div>
+            <div class="ir"><span class="ik">Saldo disponível</span><span class="iv" style="color:var(--green)">R$ 61.800,00</span></div>
+          </div>
+          <div class="panel">
+            <div class="phd"><div class="pt">Obrigações próximas</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg-mid);border-radius:8px;border:1px solid var(--border);"><div><div style="font-size:13px;font-weight:500;">DAS MEI</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Guia mensal</div></div><span class="badge bo">15 abr</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg-mid);border-radius:8px;border:1px solid var(--border);"><div><div style="font-size:13px;font-weight:500;">DASN-SIMEI</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Declaração anual</div></div><span class="badge bo">30 mai</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg-mid);border-radius:8px;border:1px solid var(--border);"><div><div style="font-size:13px;font-weight:500;">Pró-labore LTDA</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Folha de pagamento</div></div><span class="badge bg">Pago</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERFIL -->
+    <div class="screen" id="s-perfil">
+      <div class="topbar"><div><div class="ph">Meu Perfil</div><div class="ps">Seus dados pessoais e profissionais</div></div></div>
+      <div class="ph-hd">
+        <div class="av lg">CM</div>
+        <div>
+          <div style="font-size:20px;font-weight:600;letter-spacing:-.3px;">Dr. Carlos Eduardo Melo</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Cardiologista — CRM-SP 123456</div>
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+            <span class="badge bb">CRM-SP 123456</span>
+            <span class="badge bg">Conta ativa</span>
+            <span class="badge bo">Cliente desde 2020</span>
+          </div>
+        </div>
+      </div>
+      <div class="pg">
+        <div class="panel">
+          <div class="phd"><div class="pt">Dados pessoais</div></div>
+          <div class="ir"><span class="ik">Nome completo</span><span class="iv">Carlos Eduardo Melo</span></div>
+          <div class="ir"><span class="ik">CPF</span><span class="iv">•••.456.789-••</span></div>
+          <div class="ir"><span class="ik">Data de nascimento</span><span class="iv">14 / ago / 1982</span></div>
+          <div class="ir"><span class="ik">E-mail</span><span class="iv">dr.carlos@email.com</span></div>
+          <div class="ir"><span class="ik">Telefone</span><span class="iv">(35) 99812-3456</span></div>
+          <div class="ir"><span class="ik">Endereço</span><span class="iv">Poços de Caldas — MG</span></div>
+        </div>
+        <div class="panel">
+          <div class="phd"><div class="pt">Dados profissionais</div></div>
+          <div class="ir"><span class="ik">CRM</span><span class="iv">SP 123456</span></div>
+          <div class="ir"><span class="ik">Especialidade</span><span class="iv">Cardiologia</span></div>
+          <div class="ir"><span class="ik">RQE</span><span class="iv">67890</span></div>
+          <div class="ir"><span class="ik">Conselho</span><span class="iv">CFM</span></div>
+          <div class="ir"><span class="ik">Tipo de conta</span><span class="iv">Pessoa Física + PJ</span></div>
+          <div class="ir"><span class="ik">Responsável Metris</span><span class="iv">Ana Paula Ribeiro</span></div>
+        </div>
+        <div class="panel">
+          <div class="phd"><div class="pt">Locais de atendimento</div></div>
+          <div class="tl"><span class="tag">Hospital São Lucas</span><span class="tag">Clínica Saúde+</span><span class="tag">Unimed Centro</span><span class="tag">Consultório próprio</span></div>
+        </div>
+        <div class="panel">
+          <div class="phd"><div class="pt">Segurança</div></div>
+          <div class="ir"><span class="ik">Último acesso</span><span class="iv">hoje, 09:14</span></div>
+          <div class="ir"><span class="ik">Autenticação 2 fatores</span><span class="iv" style="color:var(--green)">Ativa</span></div>
+          <div class="ir"><span class="ik">Senha</span><span class="iv">Alterada há 30 dias</span></div>
+          <div style="margin-top:16px;"><button style="background:var(--bg-mid);border:1px solid var(--border);color:var(--accent);padding:9px 18px;border-radius:8px;font-family:'Sora',sans-serif;font-size:13px;cursor:pointer;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">Alterar senha</button></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var notas=[
+  {id:'#00848',emp:'Carlos Melo Medicina',tom:'Clínica Saúde+',comp:'Mar / 2026',em:'28/03/2026',val:'R$ 8.700',st:'Pendente'},
+  {id:'#00847',emp:'Carlos Melo Medicina',tom:'Hospital São Lucas',comp:'Mar / 2026',em:'15/03/2026',val:'R$ 12.500',st:'Pago'},
+  {id:'#00840',emp:'Dr. Carlos MEI',tom:'Unimed Centro',comp:'Fev / 2026',em:'28/02/2026',val:'R$ 1.800',st:'Cancelado'},
+  {id:'#00839',emp:'Carlos Melo Medicina',tom:'Hospital São Lucas',comp:'Fev / 2026',em:'18/02/2026',val:'R$ 11.200',st:'Pago'},
+  {id:'#00831',emp:'Dr. Carlos MEI',tom:'Clínica Saúde+',comp:'Jan / 2026',em:'20/01/2026',val:'R$ 9.400',st:'Pago'},
+  {id:'#00822',emp:'Dr. Carlos MEI',tom:'Hospital São Lucas',comp:'Jan / 2026',em:'10/01/2026',val:'R$ 6.200',st:'Pago'},
+  {id:'#00815',emp:'Carlos Melo Medicina',tom:'Unimed Centro',comp:'Dez / 2025',em:'22/12/2025',val:'R$ 5.300',st:'Pago'},
+  {id:'#00807',emp:'Carlos Melo Medicina',tom:'Clínica Saúde+',comp:'Dez / 2025',em:'05/12/2025',val:'R$ 7.800',st:'Pago'},
+];
+
+function bc(s){return s==='Pago'?'bg':s==='Pendente'?'bo':'br'}
+
+function renderN(d){
+  document.getElementById('ntb').innerHTML=d.map(function(n){
+    return '<tr><td style="padding-left:24px;color:var(--text-primary);font-weight:500">'+n.id+'</td><td style="font-size:12px;">'+n.emp+'</td><td>'+n.tom+'</td><td>'+n.comp+'</td><td style="font-size:12px;color:var(--text-muted)">'+n.em+'</td><td style="color:var(--accent-light);font-weight:500">'+n.val+'</td><td><span class="badge '+bc(n.st)+'">'+n.st+'</span></td><td style="padding-right:24px;"><button style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:Sora,sans-serif;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--text-muted)\'">Ver PDF</button></td></tr>';
+  }).join('');
+}
+
+function applyF(){
+  var q=document.querySelector('.fip').value.toLowerCase();
+  var sf=document.getElementById('sf').value;
+  var ef=document.getElementById('ef').value;
+  renderN(notas.filter(function(n){
+    return (n.tom.toLowerCase().includes(q)||n.id.includes(q))&&(!sf||n.st===sf)&&(!ef||n.emp===ef);
+  }));
+}
+
+function go(el){
+  document.querySelectorAll('.ni').forEach(function(i){i.classList.remove('active')});
+  el.classList.add('active');
+  var s=el.dataset.s;
+  document.querySelectorAll('.screen').forEach(function(sc){sc.classList.remove('active')});
+  document.getElementById('s-'+s).classList.add('active');
+}
+
+function doLogin(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app-shell').style.display='flex';
+  renderN(notas);
+}
+
+function doLogout(){
+  document.getElementById('app-shell').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+
+renderN(notas);
+</script>
+</body>
+</html>
